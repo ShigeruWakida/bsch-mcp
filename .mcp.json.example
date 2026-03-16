@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "bsch3v": {
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "BSCH3V_DIR": "/path/to/BSch3V"
+      }
+    }
+  }
+}

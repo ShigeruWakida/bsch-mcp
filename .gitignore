@@ -1,0 +1,18 @@
+node_modules/
+dist/
+.claude/
+
+# BSch3V binary distribution (not part of this project)
+bs3vp240108rtl/
+
+# Data format docs (reference only)
+bsch3vdataformat/
+
+# Temp files
+emblib_*.json
+build_filter.mjs
+bsch.url
+
+# Sample/test circuits
+1kHz4次バタワースフィルタ回路/
+.mcp.json

@@ -1,46 +1,115 @@
 # BSch3V MCP Server
 
-[BSch3V](http://www.suigyodo.com/online/schsoft.htm) 回路図エディタをAIが操作するためのMCP (Model Context Protocol) サーバーです。
+**AIを使って回路図を設計・編集するためのMCPサーバーです。**
 
-Claude Code や他のMCP対応AIツールから、BSch3Vの回路図ファイル(.CE3)とライブラリファイル(.LB3)を読み書き・編集できます。
+Claude等のAIと対話しながら、回路図エディタ [BSch3V](http://www.suigyodo.com/online/schsoft.htm) の回路図を自動生成・編集できます。AIが回路設計の知識を活かして部品選定・配置・配線・ネットリスト検証まで一貫して行います。
 
-## 機能
+## AIにできること
 
-### 回路図の読み書き
-- `read_schematic` / `write_schematic` / `create_schematic` — CE3ファイルの読み込み・書き出し・新規作成
-- `read_library` / `list_libraries` — LB3ライブラリの読み込み・一覧取得
-- `get_library_component` — ライブラリまたは既存CE3から部品データを取得
+### 回路の理解
+- 既存の回路図を読み込み、回路の動作を分析・説明
+- ネットリストを生成し、接続関係を解析（NL3W互換）
+- 部品一覧、ピン接続、信号フローを把握
 
-### 部品操作
-- `add_component` / `remove_component` / `move_component` — 部品の配置・削除・移動
-- `rotate_component` — 回転・反転
-- `set_component_properties` — 属性変更（名前、番号、表示位置等）
-- `get_component_pins` — ピン座標の取得
+### 回路の設計
+- 要件から回路方式を検討・比較（例: Sallen-Key vs MFB フィルタ）
+- 部品定数の計算と標準値への丸め
+- 周波数特性・ステップ応答等の解析
 
-### 配線
-- `add_wire` / `remove_wire` — ワイヤーの追加・削除
-- `add_junction` — ジャンクション（接続点）の追加
-- `add_bus` / `add_bus_entry` / `add_entry` — バス配線
-- `add_label` / `add_tag` — ネットラベル・タグ
+### 回路図の作成
+- 新規回路図の作成と部品配置
+- ワイヤー配線とジャンクション配置
+- 電源シンボル・GND・バス配線
+- ネットリストで接続を自動検証
 
-### 解析
-- `get_schematic_summary` — 回路図の概要取得
-- `get_net_connections` — ネットリスト生成（NL3W互換）
+### 回路図の編集
+- 部品の追加・削除・移動・回転・反転
+- ワイヤーの追加・削除・再配線
+- 部品属性（名前、番号、表示位置）の変更
+- シートサイズの変更
 
-### 部品作成
-- `create_component` — ピン定義から矩形IC部品を新規作成
-- `modify_library_component` — 既存部品のパターンを流用して新部品を作成
+### 部品の管理
+- BSch3Vライブラリ（LB3）からの部品検索・取得
+- 既存の回路図からの部品コピー
+- ピン定義からの新規IC部品作成
+- 既存シンボルの流用（ピン番号・名前の変更）
 
-### その他
-- `add_comment` — テキストコメント
-- `add_dash` / `add_marker` — 装飾線・マーカー
-- `set_sheet_size` / `set_visible_layers` — シート設定
+## MCPツール一覧（30ツール）
+
+<details>
+<summary>回路図の読み書き（5ツール）</summary>
+
+| ツール | 説明 |
+|---|---|
+| `read_schematic` | CE3ファイルを読み込みJSON構造で返す |
+| `write_schematic` | メモリ上の回路図をCE3ファイルに保存 |
+| `create_schematic` | 新規空回路図を作成 |
+| `read_library` | LB3ライブラリの全部品情報を取得 |
+| `list_libraries` | 利用可能なLB3ファイル一覧（BSCH3.INIから自動検出） |
+
+</details>
+
+<details>
+<summary>部品操作（10ツール）</summary>
+
+| ツール | 説明 |
+|---|---|
+| `add_component` | 部品を配置 |
+| `remove_component` | 部品を削除 |
+| `move_component` | 部品を移動 |
+| `rotate_component` | 部品を回転・反転 |
+| `set_component_properties` | 部品属性を変更 |
+| `get_component_pins` | ピン座標を取得 |
+| `get_library_component` | ライブラリ/CE3から部品データを取得 |
+| `create_component` | ピン定義から新規部品を作成 |
+| `modify_library_component` | 既存シンボルを流用して新部品を作成 |
+| `get_schematic_summary` | 回路図の部品一覧・要素数を取得 |
+
+</details>
+
+<details>
+<summary>配線（8ツール）</summary>
+
+| ツール | 説明 |
+|---|---|
+| `add_wire` | ワイヤーを追加 |
+| `remove_wire` | ワイヤーを削除 |
+| `add_junction` | ジャンクションを追加 |
+| `add_bus` | バスを追加 |
+| `add_bus_entry` | バスエントリーを追加 |
+| `add_entry` | エントリーを追加 |
+| `add_label` | ネットラベルを追加 |
+| `add_tag` | タグを追加 |
+
+</details>
+
+<details>
+<summary>解析（1ツール）</summary>
+
+| ツール | 説明 |
+|---|---|
+| `get_net_connections` | ネットリスト生成・接続解析 |
+
+</details>
+
+<details>
+<summary>装飾・設定（4ツール）</summary>
+
+| ツール | 説明 |
+|---|---|
+| `add_comment` | テキストコメントを追加 |
+| `add_dash` | 装飾線を追加 |
+| `add_marker` | マーカー線を追加 |
+| `set_sheet_size` | シートサイズを変更 |
+| `set_visible_layers` | レイヤー表示を設定 |
+
+</details>
 
 ## セットアップ
 
 ### 必要なもの
 - Node.js v18以上
-- BSch3V（回路図の表示確認用）
+- BSch3V（回路図の表示確認用、[ダウンロード](http://www.suigyodo.com/online/schsoft.htm)）
 
 ### インストール
 
@@ -53,7 +122,7 @@ npm run build
 
 ### Claude Code での設定
 
-プロジェクトの `.mcp.json` に以下を追加:
+プロジェクトの `.mcp.json` を作成:
 
 ```json
 {
@@ -69,47 +138,57 @@ npm run build
 }
 ```
 
-`BSCH3V_DIR` はBSch3Vのインストールディレクトリ（`BSCH3.INI` があるディレクトリ）を指定します。省略した場合、一般的なインストール先を自動検索します。
+`BSCH3V_DIR` はBSch3Vのインストールディレクトリ（`BSCH3.INI` があるディレクトリ）です。省略時は自動検索します。
 
-## 使い方
+## 使用例
 
-### 既存の回路図を読む
+### 既存の回路図を理解する
 
 ```
 > LEDPORT.CE3を読んで回路を説明して
 ```
 
-AIが `read_schematic` と `get_net_connections` を使って回路図を解析し、回路の動作を説明します。
+AIが回路図を読み込み、部品構成・接続関係・動作を分析して説明します。
 
 ### 回路図を編集する
 
 ```
-> Q4出力にLEDを追加して
+> U1のQ4出力にLEDを追加して
 ```
 
-AIが `add_component`, `add_wire`, `remove_component` 等を使って回路図を編集します。
+AIが必要な部品（抵抗、LED、GNDシンボル）を追加し、ワイヤーで接続します。
 
-### 新しい回路図を作る
+### 新しい回路図を設計・作成する
 
 ```
-> 1kHzのローパスフィルタ回路を設計して
+> 1kHzカットオフの4次バタワースLPFを設計して
 ```
 
-AIが回路設計を行い、`create_schematic`, `add_component`, `add_wire` 等で回路図を作成します。
+AIが回路方式の検討、部品定数の計算、回路図の作成、ネットリストの検証まで行います。
+
+### データシートから部品を作成する
+
+```
+> PIC32のデータシートからピン配置を読み取って部品を作成して
+```
+
+AIがピン定義から回路図シンボルを自動生成します。
 
 ## 対応フォーマット
 
-- **CE3** — BSch3V回路図ファイル（UTF-8/CP932自動検出、書き出しはUTF-8）
-- **LB3** — BSch3Vライブラリファイル
-- **BSCH3.INI** — BSch3V設定ファイル（UTF-16LE、ライブラリパスの自動取得）
+| ファイル | 説明 | エンコーディング |
+|---|---|---|
+| `.CE3` | 回路図 | UTF-8 / CP932（自動検出、書き出しはUTF-8） |
+| `.LB3` | ライブラリ | UTF-8 / CP932 |
+| `BSCH3.INI` | BSch3V設定 | UTF-16LE |
 
 ## 技術仕様
 
-- TypeScript / Node.js
-- MCP SDK: `@modelcontextprotocol/sdk`
-- CE3/LB3パーサー・シリアライザを独自実装
-- ネットリスト生成はNL3W（BSch3V付属ツール）のロジックをTypeScriptに移植
-- ピン座標計算はBSch3Vソースコード（C++）から正確に移植
+- **言語**: TypeScript / Node.js
+- **MCP SDK**: `@modelcontextprotocol/sdk`
+- **パーサー**: CE3/LB3テキストフォーマットの独自実装
+- **ネットリスト**: NL3W（BSch3V付属）のロジックをTypeScriptに移植
+- **ピン座標計算**: BSch3Vソースコード（C++）から移植、回転・反転対応
 
 ## ライセンス
 

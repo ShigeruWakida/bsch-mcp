@@ -9,6 +9,7 @@ import * as iconv from 'iconv-lite';
 import { parseSchematic, parseLibrary } from './parser.js';
 import { serializeSchematic } from './serializer.js';
 import { generateNetlist, pinEnd } from './netlist.js';
+import { renderSchematicToSvg } from './renderer.js';
 import type { Schematic, Component, Wire, Junction, Label, Tag, Comment, Bus, BusEntry, Entry, Dash, Marker } from './types.js';
 
 // Detect encoding: check if valid UTF-8, otherwise assume CP932
@@ -1344,6 +1345,30 @@ Width auto-calculated from pin name lengths. Minimum 4 grids.`,
       };
 
       return { content: [{ type: 'text' as const, text: JSON.stringify(embeddedLib) }] };
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return { content: [{ type: 'text' as const, text: `Error: ${msg}` }], isError: true };
+    }
+  }
+);
+
+// render_schematic: Render schematic to SVG
+server.tool(
+  'render_schematic',
+  'Render the schematic as an SVG image file. Useful for visual verification of component placement and wiring. The SVG file can be viewed in a browser.',
+  {
+    filePath: z.string().describe('Schematic file path (must be loaded first with read_schematic)'),
+    outputPath: z.string().describe('Output SVG file path'),
+  },
+  async ({ filePath, outputPath }) => {
+    const result = getSchematic(filePath);
+    if ('error' in result) return { content: [{ type: 'text' as const, text: result.error }], isError: true };
+    const { sch } = result;
+
+    try {
+      const svg = renderSchematicToSvg(sch);
+      fs.writeFileSync(outputPath, svg, 'utf-8');
+      return { content: [{ type: 'text' as const, text: `SVG rendered to ${outputPath} (${sch.sheetInfo.W}x${sch.sheetInfo.H})` }] };
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       return { content: [{ type: 'text' as const, text: `Error: ${msg}` }], isError: true };

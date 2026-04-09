@@ -5,12 +5,16 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import * as iconv from 'iconv-lite';
 import { parseSchematic, parseLibrary } from './parser.js';
 import { serializeSchematic } from './serializer.js';
 import { generateNetlist, pinEnd } from './netlist.js';
 import { renderSchematicToSvg } from './renderer.js';
 import type { Schematic, Component, Wire, Junction, Label, Tag, Comment, Bus, BusEntry, Entry, Dash, Marker } from './types.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Detect encoding: check if valid UTF-8, otherwise assume CP932
 function detectEncoding(buf: Buffer): string {
